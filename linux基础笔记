@@ -1,0 +1,66 @@
+/boot启动相关文件,内核信息
+/lib共享动态库文件，命令调用这些库
+/mnt 默认空的，提供方便临时挂载磁盘
+/proc 存系统内存的映射，可查看内存信息，CPU信息，进程信息
+/tmp 存放临时文件，进程临时文件
+/usr/src 存内核的源代码，及用户安装的一些文件默认存放地点
+/var 存系统日志文件
+
+1.	cat /proc/cpuinfo或/proc/menifo 看cpu核数及physical cpu数 或内存
+2.	mkfs.Ext4以ext4文件系统方式格式化
+3.	/etc/profile下可以让alias别名后重启不失效，让修改环境变量PATH全局可用（可以用命令source profile生效不需要关机）
+4.	编辑磁盘配额是的/etc/fstab时，添加usrquota，grpquota时用命令mount -o remount /etc/fstab 实现不重启可以使该设置生效，
+5.	更改主机名永久生效就配置/etc/sysconfig/network 或用命令systemctl set-hostname
+6.	/etc/resolv.conf文件就是加DNS。nameserver=网关地址，即可
+7.	Centos下/boot/grub/grub.conf显示开机时的内核位置、timeout、开机时菜单等
+8.	cat /etc/fstab 看挂载的分区
+9.	/etc/rc.local和/etc/profile开机自动执行其下的代码，例如挂载光驱。
+10.	/etc/inittab设置运行级别
+11.秘钥设置>>在家目录创建.ssh/文件夹在其中建authorized_keys文件，放入生成的秘钥，getenforce查看selinux防火墙，setenforce 0关闭selinux，或改/etc/selinux/config永久生效。Ubuntu用命令ufw disable 关闭防火墙。
+12.Ubuntu。在家目录创建.ssh/文件夹，连接时会生成：记录连接授权信息的known_hosts文件。执行ssh-keygen命令生成秘钥id_rsa和公钥id_rsa.pub，将公钥上传到客户端即可。
+别名：创建config文件配置如下：
+	Host  myserver
+	HostName  ip地址
+	User  username
+	Post  22
+13.	安装System-config-network-tui包或安装setuptool包，可以配置网卡网络
+14.	/etc/hosts.allow或/etc/hosts.deny限制IP，用户登录
+15.	配置/etc/ssh/sshd_config
+能使用密钥尽量避免使用密码登陆(PermitRootLogin without-password )
+可以禁止root直接登陆服务器，只允许普通用户登陆，普通用户su到			root(PermitRootLogin no )
+
+16.	Inode索引节点，记录文件的一些属性信息。（属主等）
+17./etc/rsyslog.conf管理日志的服务rsyslog的配置文件，常用日志：/var/log/messages系统核心日志。/var/log/secure安全，认证，登录相关日志。/var/log/maillog 邮件相关的日志。/var/log/wtmp记录命令last的日志。/var/log/dmesg硬件产生的信息日志
+18.	 chkconfig --level 2345 smb on关掉服务。还可以用ntsysv程序
+19.	stat看atime（访问后变） ，mtime（更改内容后变） （ctime更改了属性及inode）
+20.	ntpdate  time.windows.com 同步时间服务器
+21.	服务器访问状态码200，302即没问题，出现状态码为502即php可能挂了或被攻击
+22.	chmod u+s filename让普通用户可以临时拥有root权限执行该文件
+23.	chattr +a filename不能改，删，可以追加>> 
+24.	chattr +i filename不能动，固定谁都不能动
+25.	lsattr查看特殊权限
+26.	setfacl -m u:username:rwx filename设置文件的扩展权限。getfal看它的acl属性。setfacl -x u:username filename把其踢出acl机制。
+27.	假如user1执行了crontab -e命令。 即是编辑了/var/spool/cron/user1文件
+28.	dmidecode看关于系统的很多信息
+29.	uname -a 看Linux系统位数或者是file /bin/ls
+30.	cat /etc/issue查看内核和发行版
+31.	wc -l 统计行数
+32.	df -h看分区使用情况 mount看文件系统信息
+33.	blkid  /dev/sdb 显示设备UUID
+34.	du -sh统计文件占磁盘的大小，一块一般4k
+35.	fdisk /dev/sdb 对磁盘进行分区
+36.	grep -A1 ‘net addr’ file 把file文件中有net addr字符的行和其下一行过滤出来，-B1则过滤出其上一行，-C1即上下一行 ，grep -r 是递归地遍历查找文件。grep -E等同于egrep。grep -E ‘bash|root’ file 或grep ‘bash\|root’ file.过滤出有bash或root的行，grep -w 以一个词（word）过滤。
+37.	sed -i会直接对文件修改了。功能：sed ‘s/\(root\)\(.*\)\(bash\)/\3\2\1/g’调序，替换，sed ‘/root/d’删除，sed ‘/root/p’ -n过滤打印匹配的行， sed ‘s/root/eeee/g’ 把root替换为eeee
+38.	$0是打印出整行，或者所有段
+awk -F ‘root’ ‘{print $1}’ file 以root为分割符打印出第一段（$1）
+awk -F ‘：’ ‘{print $1“#”$2”#”$3}’ file 以冒号为分割的1,2,3段用#连接起来。
+awk -F ‘：’ ‘$1~/root/’ file 匹配以冒号分割的第1段为root的行。
+awk -F ‘：’ ‘$1==’root’ file 匹配以冒号分割第一段字符串等于root的行，一个等于号表示赋值
+awk -F ‘：’ ‘{print NF}’ file 打印以冒号分割出的段数
+awk -F ‘NR>20’ file 打印出大于20行的后面的行
+可以多个字符分割。
+39.	cut -d ‘：’ -f1 /etc/passwd 剪出以冒号分割的第一段 ，cut -c2 截取第二个字符（可以跟范围）只能以一个字符分割
+40.	sort -t： -k3  -n 以冒号分割的第三段进行数字大小排序 ,管道|（uniq进行去重复）uniq -c是得出多少重复次数
+41.	find ./ -type f |xargs -i cp {} /tmp/hacden一个一个文件拷贝到/tmp/hacden目录下
+42.	查看系统负载 w、uptime、top、vmstat 1（1表示1秒），vmstat 1  5 (五次后结束)
+
