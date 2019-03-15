@@ -63,4 +63,26 @@ awk -F ‘NR>20’ file 打印出大于20行的后面的行
 40.	sort -t： -k3  -n 以冒号分割的第三段进行数字大小排序 ,管道|（uniq进行去重复）uniq -c是得出多少重复次数
 41.	find ./ -type f |xargs -i cp {} /tmp/hacden一个一个文件拷贝到/tmp/hacden目录下
 42.	查看系统负载 w、uptime、top、vmstat 1（1表示1秒），vmstat 1  5 (五次后结束)
-
+43.	buffers 缓冲（cpu把数据放到buffers（内存）中再写到磁盘）  cached 缓存（磁盘把数据拿到cahced（内存）等cpu读）
+44.	ps aux命令中的memcached是存从mysql中读取出来的数据，相当于swap功能
+45.	find / -mtime -1 -type  f  | xargs -i cp { }  { }.bak 把查找到的文件复制名为后缀.bak，（单独xargs会合并为一行）
+46.	dd if of=./file bs=1 count=100,创建当前路径file文件块大小为1M，大小为100M的文件，dd if=/dev/zero of=./file bs=1M count=100，if后面加磁盘设备名，/dev/zero是linux下的不断生产0的设备。mkswap -f ./file 格式化文件file，swapon /file挂载在file文件中，swapoff /file 删除其（虚拟swap）
+47.	mii-tool eth0查看网络连接性
+48.	locate加文件名>>模糊搜索（安装mlocate这个包，用updatedb命令手动生成这个库）
+49.	set_uid (chmod  u+s  filename(必须是二进制文件)。文件，在执行阶段具有文件所以者的权限) 。set_gid (chmod  g+s （目录）。目录，用户在此目录下创建的文件都具有和改目录所属的组相同的组)。Sticky bit（chmod o+t （目录）。目录，防删除位）
+50.	如果mount命令不能挂载磁盘时，用dmesg命令查看相关错误信息。
+51.	tune2fs -l /dev/sdb5 |grep “Block size” 查看某个分区格式化时指定的块大小。
+52.	vi下的：e！命令将文档还原为原始状态。：！ ls /home暂时离开vi去执行ls命令
+53.	vi下的Ctrl+r反返回，按两次u返回
+54.	yum install 命令出现host不识别，则还原etc/hosts文件内容。或有缓存，则需要更新etc/yum.repos.d下面的文件,并用命令yum makecache生成新缓存。
+55.	安装sysstat。 命令：sar -n DEV 1 10 看网卡流量，sar -f /var/log/sa/sa08看某天的系统使用率，sar -q 看系统负载，sar -b 1 5看磁盘读写情况
+56.	Tcpdump。 linux自带的抓包工具 命令：tcpdump -nn -vs0  显示ip和详细包。  tcpdump -nn -i eth0 tcp and port 22  抓eth0网卡和端口22的tcp包。Tcpdump -r xx.cap 查看后缀为cap的文件。
+57.	Wireshark。 linux中用命令：tshark -n -t  a -R http.request -T fields -e “frame.time” -e “ip.src” -e “http.host” -e “http.request.method” -e “http.request.uri” 详细显示访问服务器的访问者信息
+58.	iptables -t filter-nvl 查看表为filter的防火墙规则(有nat表)   iptables -F 删除所有规则   iptables -z计数器请零
+59.	Screen。把进程放到虚拟终端关机后还可以调出
+60.	Scp。支持双向拷贝文件
+61.	rsync。支持双向拷贝文件
+62.	命令：chkconfig --level 运行级别 服务 off ， chkconfig --add 服务
+63.	mkpasswd命令生成不规则的密码，其安装包是expect
+64.	iptables -I INPUT -p tcp --dport 22 -j DROP;iptables -I INPUT -p tcp --dport 22 -s 192.168.8.0/24 -j ACCEPT 可以让192.168.0.0段访问，其他不能
+65.	iptables -nvL 查看防火墙规则，iptables -F 重置规则
